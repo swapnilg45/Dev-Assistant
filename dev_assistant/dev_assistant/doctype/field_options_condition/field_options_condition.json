@@ -1,0 +1,56 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2025-01-27 10:00:00.000000",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "condition_field",
+  "condition_operator",
+  "condition_value",
+  "is_active"
+ ],
+ "fields": [
+  {
+   "fieldname": "condition_field",
+   "fieldtype": "Data",
+   "label": "Condition Field",
+   "reqd": 1,
+   "description": "Field name to check for condition"
+  },
+  {
+   "fieldname": "condition_operator",
+   "fieldtype": "Select",
+   "label": "Condition Operator",
+   "options": "equals\nnot equals\ncontains\nnot contains\nis empty\nis not empty\ngreater than\nless than",
+   "reqd": 1,
+   "default": "equals"
+  },
+  {
+   "fieldname": "condition_value",
+   "fieldtype": "Data",
+   "label": "Condition Value",
+   "description": "Value to compare against (leave empty for 'is empty'/'is not empty')"
+  },
+  {
+   "default": "1",
+   "fieldname": "is_active",
+   "fieldtype": "Check",
+   "label": "Is Active"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2025-01-27 10:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "Dev Assistant",
+ "name": "Field Options Condition",
+ "owner": "Administrator",
+ "permissions": [],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "track_changes": 1,
+ "istable": 1
+}
+

@@ -1,0 +1,47 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2025-01-27 10:00:00.000000",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "option_value",
+  "option_label",
+  "is_active"
+ ],
+ "fields": [
+  {
+   "fieldname": "option_value",
+   "fieldtype": "Data",
+   "label": "Option Value",
+   "reqd": 1,
+   "description": "The actual value that will be stored"
+  },
+  {
+   "fieldname": "option_label",
+   "fieldtype": "Data",
+   "label": "Option Label",
+   "description": "Display label for the option (optional)"
+  },
+  {
+   "default": "1",
+   "fieldname": "is_active",
+   "fieldtype": "Check",
+   "label": "Is Active"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2025-01-27 10:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "Dev Assistant",
+ "name": "Field Options Configuration",
+ "owner": "Administrator",
+ "permissions": [],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "track_changes": 1,
+ "istable": 1
+}
+
