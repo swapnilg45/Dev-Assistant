@@ -1,0 +1,178 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2025-08-23 11:10:00",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "doctype_name",
+  "role",
+  "is_active",
+  "description",
+  "column_break_1",
+  "apply_to_all_roles",
+  "apply_to_all_doctypes",
+  "enable_user_exceptions",
+  "docname_filter",
+  "docname_pattern",
+  "specific_docname",
+  "custom_condition",
+  "section_break_2",
+  "field_configurations",
+  "tab_break_ykle",
+  "section_break_3",
+  "user_exceptions"
+ ],
+ "fields": [
+  {
+   "fieldname": "doctype_name",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Document Type",
+   "options": "DocType",
+   "reqd": 1
+  },
+  {
+   "depends_on": "eval:!doc.apply_to_all_roles",
+   "fieldname": "role",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Role",
+   "options": "Role",
+   "reqd": 1
+  },
+  {
+   "default": "1",
+   "fieldname": "is_active",
+   "fieldtype": "Check",
+   "label": "Is Active"
+  },
+  {
+   "fieldname": "description",
+   "fieldtype": "Small Text",
+   "label": "Description",
+   "placeholder": "Brief description of this configuration"
+  },
+  {
+   "fieldname": "column_break_1",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "0",
+   "description": "If checked, this configuration will apply to all roles for the selected doctype",
+   "fieldname": "apply_to_all_roles",
+   "fieldtype": "Check",
+   "label": "Apply to All Roles"
+  },
+  {
+   "default": "0",
+   "description": "If checked, this configuration will apply to all doctypes for the selected role",
+   "fieldname": "apply_to_all_doctypes",
+   "fieldtype": "Check",
+   "label": "Apply to All Doctypes"
+  },
+  {
+   "default": "All Documents",
+   "description": "Choose how to filter documents by name",
+   "fieldname": "docname_filter",
+   "fieldtype": "Select",
+   "label": "Document Name Filter",
+   "options": "All Documents\nSpecific Document\nDocument Name Pattern\nCustom Condition"
+  },
+  {
+   "depends_on": "eval:doc.docname_filter=='Document Name Pattern'",
+   "description": "Pattern to match document names (e.g., STO-*, ITEM-*, etc.)",
+   "fieldname": "docname_pattern",
+   "fieldtype": "Data",
+   "label": "Document Name Pattern"
+  },
+  {
+   "depends_on": "eval:doc.docname_filter=='Specific Document'",
+   "description": "Exact document name to apply this configuration",
+   "fieldname": "specific_docname",
+   "fieldtype": "Data",
+   "label": "Specific Document Name"
+  },
+  {
+   "depends_on": "eval:doc.docname_filter=='Custom Condition'",
+   "description": "Python code to evaluate if document should be affected",
+   "fieldname": "custom_condition",
+   "fieldtype": "Code",
+   "label": "Custom Condition"
+  },
+  {
+   "fieldname": "section_break_3",
+   "fieldtype": "Section Break"
+  },
+  {
+   "default": "0",
+   "description": "Check this to exclude specific users from this configuration",
+   "fieldname": "enable_user_exceptions",
+   "fieldtype": "Check",
+   "label": "Enable User Exceptions"
+  },
+  {
+   "depends_on": "eval:doc.enable_user_exceptions",
+   "description": "Users who will be excluded from this configuration",
+   "fieldname": "user_exceptions",
+   "fieldtype": "Table",
+   "label": "User Exceptions",
+   "options": "User Exception Detail"
+  },
+  {
+   "fieldname": "section_break_2",
+   "fieldtype": "Section Break",
+   "label": "Field Control"
+  },
+  {
+   "description": "Configure which fields to hide or make read-only",
+   "fieldname": "field_configurations",
+   "fieldtype": "Table",
+   "label": "Field Configurations",
+   "options": "Field Configuration Detail"
+  },
+  {
+   "depends_on": "eval:doc.enable_user_exceptions",
+   "fieldname": "tab_break_ykle",
+   "fieldtype": "Tab Break",
+   "label": "User Exceptions"
+  }
+ ],
+ "links": [],
+ "modified": "2025-08-23 12:07:35.455605",
+ "modified_by": "Administrator",
+ "module": "Dev Assistant",
+ "name": "Field Access Control",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Administrator",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "track_changes": 1
+}

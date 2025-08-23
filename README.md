@@ -1,33 +1,35 @@
-### Dev Assistant
+# Dev Assistant
 
-This is a custom app.
+A Frappe app for developer productivity tools and utilities.
 
-### Installation
+## Features
 
-You can install this app using the [bench](https://github.com/frappe/bench) CLI:
+### Field Access Control
+- Role-based field visibility and read-only controls
+- User exception management
+- Document-specific filtering
+- Easy field selection interface
 
-```bash
-cd $PATH_TO_YOUR_BENCH
-bench get-app $URL_OF_THIS_REPO --branch develop
-bench install-app dev_assistant
-```
-
-### Contributing
-
-This app uses `pre-commit` for code formatting and linting. Please [install pre-commit](https://pre-commit.com/#installation) and enable it for this repository:
+## Installation
 
 ```bash
-cd apps/dev_assistant
-pre-commit install
+bench get-app dev_assistant
+bench --site [site-name] install-app dev_assistant
 ```
 
-Pre-commit is configured to use the following tools for checking and formatting your code:
+## Usage
 
-- ruff
-- eslint
-- prettier
-- pyupgrade
+1. Create a new "Field Access Control" record
+2. Select doctype and role
+3. Use "Select Fields" button to choose fields
+4. Configure hide/read-only actions
+5. Save and the rules will be automatically applied
 
-### License
+## Requirements
 
-mit
+- Frappe Framework
+- ERPNext (optional)
+
+## License
+
+MIT
