@@ -86,6 +86,13 @@
             return;
         }
         
+        // Check if this is a child table field
+        if (fieldConfig.is_child_table_field) {
+            console.log('👶 Applying child table field configuration:', fieldConfig);
+            applyChildTableFieldConfiguration(frm, fieldConfig);
+            return;
+        }
+        
         // Use Frappe's existing methods for field control
         switch (fieldConfig.action_type) {
             case 'Hide':
@@ -109,6 +116,70 @@
                 
             default:
                 console.log('❌ Unknown action type: ' + fieldConfig.action_type);
+        }
+    }
+    
+    function applyChildTableFieldConfiguration(frm, fieldConfig) {
+        console.log('👶 applyChildTableFieldConfiguration called:', fieldConfig);
+        
+        const parentField = fieldConfig.parent_field;
+        const childFieldname = fieldConfig.child_fieldname;
+        const actionType = fieldConfig.action_type;
+        
+        // Apply to existing child table rows
+        if (frm.doc[parentField]) {
+            frm.doc[parentField].forEach(function(childRow, index) {
+                applyChildTableRowFieldControl(frm, parentField, index, childFieldname, actionType);
+            });
+        }
+        
+        // Listen for new child table rows
+        frm.fields_dict[parentField].grid.wrapper.on('row_added', function() {
+            setTimeout(function() {
+                const lastIndex = frm.doc[parentField].length - 1;
+                applyChildTableRowFieldControl(frm, parentField, lastIndex, childFieldname, actionType);
+            }, 100);
+        });
+    }
+    
+    function applyChildTableRowFieldControl(frm, parentField, rowIndex, childFieldname, actionType) {
+        console.log('👶👶 applyChildTableRowFieldControl:', parentField, rowIndex, childFieldname, actionType);
+        
+        try {
+            const grid = frm.fields_dict[parentField].grid;
+            const row = grid.grid_rows[rowIndex];
+            
+            if (!row) {
+                console.log('❌ Row not found for index:', rowIndex);
+                return;
+            }
+            
+            const fieldWrapper = row.wrapper.find(`[data-fieldname="${childFieldname}"]`);
+            
+            if (fieldWrapper.length === 0) {
+                console.log('❌ Child field not found:', childFieldname);
+                return;
+            }
+            
+            switch (actionType) {
+                case 'Hide':
+                    console.log('🙈 Hiding child table field:', childFieldname);
+                    fieldWrapper.hide();
+                    break;
+                    
+                case 'Read Only':
+                    console.log('🔒 Making child table field readonly:', childFieldname);
+                    const input = fieldWrapper.find('input, select, textarea');
+                    if (input.length > 0) {
+                        input.prop('readonly', true).addClass('read-only');
+                    }
+                    break;
+                    
+                default:
+                    console.log('❌ Unknown action type for child table field:', actionType);
+            }
+        } catch (error) {
+            console.log('❌ Error applying child table field control:', error);
         }
     }
     
