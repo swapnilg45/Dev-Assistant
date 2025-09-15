@@ -1,0 +1,78 @@
+{
+ "actions": [],
+ "creation": "2025-09-15 12:00:00",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "field_name",
+  "operator",
+  "column_break_1",
+  "value_type",
+  "value",
+  "section_break_1",
+  "description"
+ ],
+ "fields": [
+  {
+   "fieldname": "field_name",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Field Name",
+   "reqd": 1
+  },
+  {
+   "default": "=",
+   "fieldname": "operator",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Operator",
+   "options": "=\n!=\nin\nnot in\nlike\nnot like\n>=\n<=\n>\n<\nis set\nis not set\nbetween",
+   "reqd": 1
+  },
+  {
+   "fieldname": "column_break_1",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "Static Value",
+   "description": "How to determine the comparison value",
+   "fieldname": "value_type",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Value Type",
+   "options": "Static Value\nCurrent User\nUser Property\nSession Value\nDefault Value\nToday\nNow"
+  },
+  {
+   "depends_on": "eval:!['is set', 'is not set', 'Today', 'Now'].includes(doc.value_type)",
+   "fieldname": "value",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Value",
+   "placeholder": "Value to compare or property name"
+  },
+  {
+   "fieldname": "section_break_1",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "description",
+   "fieldtype": "Small Text",
+   "label": "Description",
+   "placeholder": "Optional description for this filter condition"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "istable": 1,
+ "links": [],
+ "modified": "2025-09-15 12:00:00",
+ "modified_by": "Administrator",
+ "module": "Dev Assistant",
+ "name": "Permission Query Field Filter",
+ "owner": "Administrator",
+ "permissions": [],
+ "quick_entry": 1,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "track_changes": 1
+}

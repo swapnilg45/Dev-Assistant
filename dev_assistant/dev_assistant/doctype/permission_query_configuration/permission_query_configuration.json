@@ -1,0 +1,244 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2025-09-15 12:00:00",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "doctype_name",
+  "role",
+  "is_active",
+  "priority",
+  "column_break_1",
+  "permission_type",
+  "description",
+  "section_break_2",
+  "filter_method",
+  "column_break_3",
+  "apply_to_list_view",
+  "apply_to_form_view",
+  "apply_to_reports",
+  "section_break_simple",
+  "field_filters",
+  "section_break_custom",
+  "custom_query",
+  "section_break_sql",
+  "sql_query",
+  "section_break_exceptions",
+  "enable_user_exceptions",
+  "user_exceptions",
+  "section_break_audit",
+  "enable_audit_log",
+  "last_applied"
+ ],
+ "fields": [
+  {
+   "fieldname": "doctype_name",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Document Type",
+   "options": "DocType",
+   "reqd": 1
+  },
+  {
+   "fieldname": "role",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Role",
+   "options": "Role",
+   "reqd": 1
+  },
+  {
+   "default": "1",
+   "fieldname": "is_active",
+   "fieldtype": "Check",
+   "in_list_view": 1,
+   "label": "Is Active"
+  },
+  {
+   "default": "1",
+   "description": "Higher number = higher priority when multiple configs apply",
+   "fieldname": "priority",
+   "fieldtype": "Int",
+   "label": "Priority"
+  },
+  {
+   "fieldname": "column_break_1",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "Read",
+   "description": "Which permission this configuration affects",
+   "fieldname": "permission_type",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Permission Type",
+   "options": "Read\nWrite\nCreate\nDelete\nPrint\nEmail\nReport\nExport\nImport",
+   "reqd": 1
+  },
+  {
+   "fieldname": "description",
+   "fieldtype": "Small Text",
+   "label": "Description",
+   "placeholder": "Brief description of this permission query"
+  },
+  {
+   "fieldname": "section_break_2",
+   "fieldtype": "Section Break",
+   "label": "Query Configuration"
+  },
+  {
+   "default": "Simple Field Match",
+   "description": "How to build the permission query",
+   "fieldname": "filter_method",
+   "fieldtype": "Select",
+   "label": "Filter Method",
+   "options": "Simple Field Match\nCustom Python Query\nSQL Query",
+   "reqd": 1
+  },
+  {
+   "fieldname": "column_break_3",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "1",
+   "description": "Apply this permission filter in List View",
+   "fieldname": "apply_to_list_view",
+   "fieldtype": "Check",
+   "label": "Apply to List View"
+  },
+  {
+   "default": "1",
+   "description": "Apply this permission filter in Form View",
+   "fieldname": "apply_to_form_view",
+   "fieldtype": "Check",
+   "label": "Apply to Form View"
+  },
+  {
+   "default": "1",
+   "description": "Apply this permission filter in Reports",
+   "fieldname": "apply_to_reports",
+   "fieldtype": "Check",
+   "label": "Apply to Reports"
+  },
+  {
+   "depends_on": "eval:doc.filter_method=='Simple Field Match'",
+   "fieldname": "section_break_simple",
+   "fieldtype": "Section Break",
+   "label": "Simple Field Filters"
+  },
+  {
+   "depends_on": "eval:doc.filter_method=='Simple Field Match'",
+   "description": "Define field-based conditions for document filtering",
+   "fieldname": "field_filters",
+   "fieldtype": "Table",
+   "label": "Field Filter Conditions",
+   "options": "Permission Query Field Filter"
+  },
+  {
+   "depends_on": "eval:doc.filter_method=='Custom Python Query'",
+   "fieldname": "section_break_custom",
+   "fieldtype": "Section Break",
+   "label": "Custom Python Query"
+  },
+  {
+   "depends_on": "eval:doc.filter_method=='Custom Python Query'",
+   "description": "Python code that returns query conditions as dict or list. Available variables: user, doc, frappe",
+   "fieldname": "custom_query",
+   "fieldtype": "Code",
+   "label": "Custom Query Code",
+   "language": "python",
+   "placeholder": "# Example:\n# return {'owner': frappe.session.user}\n# or\n# return [['company', '=', frappe.defaults.get_user_default('Company')]]"
+  },
+  {
+   "depends_on": "eval:doc.filter_method=='SQL Query'",
+   "fieldname": "section_break_sql",
+   "fieldtype": "Section Break",
+   "label": "SQL Query"
+  },
+  {
+   "depends_on": "eval:doc.filter_method=='SQL Query'",
+   "description": "SQL WHERE clause conditions. Use table alias 'tab' for main table",
+   "fieldname": "sql_query",
+   "fieldtype": "Code",
+   "label": "SQL WHERE Clause",
+   "language": "sql",
+   "placeholder": "tab.owner = '{user}' AND tab.company = '{company}'"
+  },
+  {
+   "fieldname": "section_break_exceptions",
+   "fieldtype": "Section Break",
+   "label": "User Exceptions"
+  },
+  {
+   "default": "0",
+   "description": "Allow specific users to bypass this permission query",
+   "fieldname": "enable_user_exceptions",
+   "fieldtype": "Check",
+   "label": "Enable User Exceptions"
+  },
+  {
+   "depends_on": "eval:doc.enable_user_exceptions",
+   "description": "Users who will bypass this permission query",
+   "fieldname": "user_exceptions",
+   "fieldtype": "Table",
+   "label": "User Exceptions",
+   "options": "User Exception Detail"
+  },
+  {
+   "fieldname": "section_break_audit",
+   "fieldtype": "Section Break",
+   "label": "Audit & Monitoring"
+  },
+  {
+   "default": "0",
+   "description": "Log when this permission query is applied",
+   "fieldname": "enable_audit_log",
+   "fieldtype": "Check",
+   "label": "Enable Audit Log"
+  },
+  {
+   "fieldname": "last_applied",
+   "fieldtype": "Datetime",
+   "label": "Last Applied",
+   "read_only": 1
+  }
+ ],
+ "links": [],
+ "modified": "2025-09-15 12:00:00",
+ "modified_by": "Administrator",
+ "module": "Dev Assistant",
+ "name": "Permission Query Configuration",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Administrator",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "sort_field": "priority",
+ "sort_order": "DESC",
+ "states": [],
+ "track_changes": 1
+}
