@@ -19,6 +19,9 @@
   "custom_condition",
   "section_break_2",
   "field_configurations",
+  "section_break_4",
+  "enable_child_table_control",
+  "child_table_configurations",
   "tab_break_ykle",
   "section_break_3",
   "user_exceptions"
@@ -130,6 +133,26 @@
    "fieldtype": "Table",
    "label": "Field Configurations",
    "options": "Field Configuration Detail"
+  },
+  {
+   "fieldname": "section_break_4",
+   "fieldtype": "Section Break",
+   "label": "Child Table Control"
+  },
+  {
+   "default": "0",
+   "description": "Enable control over child table add/delete buttons",
+   "fieldname": "enable_child_table_control",
+   "fieldtype": "Check",
+   "label": "Enable Child Table Control"
+  },
+  {
+   "depends_on": "eval:doc.enable_child_table_control",
+   "description": "Configure which child table buttons to hide",
+   "fieldname": "child_table_configurations",
+   "fieldtype": "Table",
+   "label": "Child Table Configurations",
+   "options": "Child Table Button Configuration"
   },
   {
    "depends_on": "eval:doc.enable_user_exceptions",

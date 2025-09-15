@@ -7,6 +7,13 @@ frappe.ui.form.on("Field Access Control", {
 		frm.add_custom_button(__('Select Fields'), function() {
 			loadDoctypeFields(frm);
 		});
+		
+		// Add Select Child Tables button if child table control is enabled
+		if (frm.doc.enable_child_table_control && frm.doc.doctype_name) {
+			frm.add_custom_button(__('Select Child Tables'), function() {
+				loadChildTables(frm);
+			});
+		}
 	},
 	
 	doctype_name: function(frm) {
@@ -15,6 +22,11 @@ frappe.ui.form.on("Field Access Control", {
 			frm.set_value('field_configurations', []);
 			frm.refresh_field('field_configurations');
 		}
+	},
+	
+	enable_child_table_control: function(frm) {
+		// Refresh buttons when child table control is toggled
+		frm.trigger('refresh');
 	}
 });
 
@@ -212,6 +224,124 @@ function applyConfigurations(frm) {
 	frappe.msgprint({
 		title: __('Configuration Saved'),
 		message: __('Field access control configuration has been saved. The settings will be automatically applied when users with the selected role access forms.'),
+		indicator: 'green'
+	});
+}
+
+function loadChildTables(frm) {
+	if (!frm.doc.doctype_name) {
+		frappe.msgprint({
+			title: __('No Doctype Selected'),
+			message: __('Please select a Document Type first.'),
+			indicator: 'orange'
+		});
+		return;
+	}
+	
+	frappe.call({
+		method: 'dev_assistant.dev_assistant.doctype.field_access_control.field_access_control.get_child_table_fields',
+		args: {
+			doctype_name: frm.doc.doctype_name
+		},
+		callback: function(r) {
+			if (!r.exc && r.message && r.message.length > 0) {
+				showChildTableSelectionModal(frm, r.message);
+			} else {
+				frappe.msgprint({
+					title: __('No Child Tables'),
+					message: __('No child tables found for this Document Type.'),
+					indicator: 'orange'
+				});
+			}
+		}
+	});
+}
+
+function showChildTableSelectionModal(frm, tables) {
+	let d = new frappe.ui.Dialog({
+		title: __('Select Child Tables to Control'),
+		width: 600,
+		fields: [
+			{
+				fieldtype: 'HTML',
+				fieldname: 'tables_list',
+				options: createChildTablesListHTML(tables)
+			}
+		],
+		primary_action_label: __('Add Selected Tables'),
+		primary_action: function() {
+			addSelectedChildTables(frm, d, tables);
+		}
+	});
+	
+	d.show();
+}
+
+function createChildTablesListHTML(tables) {
+	let html = '<div style="max-height: 400px; overflow-y: auto;">';
+	html += '<table class="table table-bordered">';
+	html += '<thead><tr><th><input type="checkbox" id="select-all-tables"></th><th>Table Label</th><th>Table Fieldname</th></tr></thead>';
+	html += '<tbody>';
+	
+	tables.forEach(function(table, index) {
+		html += `<tr>`;
+		html += `<td><input type="checkbox" class="table-checkbox" value="${index}" data-fieldname="${table.fieldname}" data-label="${table.label}"></td>`;
+		html += `<td><strong>${table.label}</strong></td>`;
+		html += `<td><code>${table.fieldname}</code></td>`;
+		html += '</tr>';
+	});
+	
+	html += '</tbody></table></div>';
+	
+	// Add select all functionality
+	html += '<script>';
+	html += '$("#select-all-tables").on("change", function() {';
+	html += '  $(".table-checkbox").prop("checked", $(this).prop("checked"));';
+	html += '});';
+	html += '</script>';
+	
+	return html;
+}
+
+function addSelectedChildTables(frm, dialog, tables) {
+	const selectedCheckboxes = $('.table-checkbox:checked');
+	const selectedTables = [];
+	
+	selectedCheckboxes.each(function() {
+		const checkbox = $(this);
+		const tableIndex = parseInt(checkbox.val());
+		const table = tables[tableIndex];
+		selectedTables.push({
+			table_fieldname: table.fieldname,
+			table_label: table.label
+		});
+	});
+	
+	if (selectedTables.length === 0) {
+		frappe.msgprint({
+			title: __('No Tables Selected'),
+			message: __('Please select at least one child table to control.'),
+			indicator: 'orange'
+		});
+		return;
+	}
+	
+	// Add tables to the child table configurations
+	selectedTables.forEach(function(table) {
+		const row = frm.add_child('child_table_configurations');
+		row.table_fieldname = table.table_fieldname;
+		row.table_label = table.table_label;
+		row.hide_add_button = 0;
+		row.hide_delete_button = 0;
+		row.is_active = 1;
+	});
+	
+	frm.refresh_field('child_table_configurations');
+	dialog.hide();
+	
+	frappe.msgprint({
+		title: __('Tables Added'),
+		message: __(`Added ${selectedTables.length} child table(s) to configuration.`),
 		indicator: 'green'
 	});
 }

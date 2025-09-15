@@ -52,19 +52,19 @@
         // Get user's roles
         var userRoles = frappe.user_roles || [];
         console.log('👤 User roles:', userRoles);
-        
+
         // Process each configuration
         configurations.forEach(function(config, index) {
             console.log('📋 Processing config ' + (index + 1) + ':', config);
-            
+
             // Check if configuration applies to user's role
             if (config.role && userRoles.indexOf(config.role) === -1 && !config.apply_to_all_roles) {
                 console.log('❌ Config skipped - user doesn\'t have role: ' + config.role);
                 return;
             }
-            
+
             console.log('✅ Config applies to user - role: ' + config.role + ', apply_to_all_roles: ' + config.apply_to_all_roles);
-            
+
             // Apply field configurations
             if (config.field_configurations) {
                 console.log('🔧 Applying ' + config.field_configurations.length + ' field configurations');
@@ -74,6 +74,17 @@
                 });
             } else {
                 console.log('❌ No field configurations found in this config');
+            }
+
+            // Apply child table button configurations
+            if (config.child_table_configurations) {
+                console.log('🔧 Applying ' + config.child_table_configurations.length + ' child table configurations');
+                config.child_table_configurations.forEach(function(tableConfig, tableIndex) {
+                    console.log('📝 Table config ' + (tableIndex + 1) + ':', tableConfig);
+                    applyChildTableConfiguration(cur_frm, tableConfig);
+                });
+            } else {
+                console.log('❌ No child table configurations found in this config');
             }
         });
     }
@@ -111,6 +122,80 @@
                 console.log('❌ Unknown action type: ' + fieldConfig.action_type);
         }
     }
+
+    // Function to apply child table configuration dynamically
+    function applyChildTableConfiguration(frm, tableConfig) {
+        console.log('🔧 applyChildTableConfiguration called:', tableConfig);
+
+        if (!tableConfig.table_fieldname || !tableConfig.is_active) {
+            console.log('❌ Table config inactive or missing table_fieldname:', tableConfig);
+            return;
+        }
+
+        setTimeout(function() {
+            var grid_field = frm.get_field(tableConfig.table_fieldname);
+            if (grid_field && grid_field.grid) {
+                console.log('📋 Processing table: ' + tableConfig.table_fieldname +
+                           ', hide_add: ' + tableConfig.hide_add_button +
+                           ', hide_delete: ' + tableConfig.hide_delete_button +
+                           ', is_active: ' + tableConfig.is_active);
+
+                // Handle add button hiding - only if explicitly enabled
+                if (tableConfig.hide_add_button === 1) {
+                    console.log('🙈 Hiding add buttons for table: ' + tableConfig.table_fieldname);
+
+                    // Hide specific add-related buttons only
+                    grid_field.grid.wrapper.find('.grid-add-row').hide();
+                    grid_field.grid.wrapper.find('button:contains("Add Row")').hide();
+                    grid_field.grid.wrapper.find('button:contains("Add Multiple")').hide();
+                    grid_field.grid.wrapper.find('[data-action="add"]').hide();
+                    grid_field.grid.wrapper.find('[data-action="add_multiple"]').hide();
+
+                    // Set Frappe property to disable add functionality
+                    frm.set_df_property(tableConfig.table_fieldname, 'cannot_add_rows', 1);
+                    grid_field.grid.cannot_add_rows = true;
+                    grid_field.grid.df.cannot_add_rows = true;
+                } else {
+                    console.log('✅ Add buttons allowed for table: ' + tableConfig.table_fieldname);
+                    // Ensure add functionality is enabled
+                    frm.set_df_property(tableConfig.table_fieldname, 'cannot_add_rows', 0);
+                    grid_field.grid.cannot_add_rows = false;
+                    grid_field.grid.df.cannot_add_rows = false;
+                }
+
+                // Handle delete button hiding - only if explicitly enabled
+                if (tableConfig.hide_delete_button === 1) {
+                    console.log('🙈 Hiding delete buttons for table: ' + tableConfig.table_fieldname);
+
+                    // Hide specific delete-related buttons only
+                    grid_field.grid.wrapper.find('.grid-delete-row').hide();
+                    grid_field.grid.wrapper.find('.grid-remove-rows').hide();
+                    grid_field.grid.wrapper.find('button:contains("Delete")').hide();
+                    grid_field.grid.wrapper.find('button:contains("Delete All")').hide();
+                    grid_field.grid.wrapper.find('[data-action="delete"]').hide();
+                    grid_field.grid.wrapper.find('[data-action="delete_all"]').hide();
+
+                    // Set Frappe property to disable delete functionality
+                    frm.set_df_property(tableConfig.table_fieldname, 'cannot_delete_rows', 1);
+                    grid_field.grid.cannot_delete_rows = true;
+                    grid_field.grid.df.cannot_delete_rows = true;
+                } else {
+                    console.log('✅ Delete buttons allowed for table: ' + tableConfig.table_fieldname);
+                    // Ensure delete functionality is enabled
+                    frm.set_df_property(tableConfig.table_fieldname, 'cannot_delete_rows', 0);
+                    grid_field.grid.cannot_delete_rows = false;
+                    grid_field.grid.df.cannot_delete_rows = false;
+                }
+
+                // Refresh the field to apply changes
+                frm.refresh_field(tableConfig.table_fieldname);
+
+                console.log('✅ Child table configuration applied successfully for: ' + tableConfig.table_fieldname);
+            } else {
+                console.log('❌ Grid field not found for: ' + tableConfig.table_fieldname);
+            }
+        }, 100);
+    }
     
     // Chrome-specific initialization
     if (document.readyState === 'loading') {
@@ -127,7 +212,7 @@
         console.log('🔧 Setting up field access control...');
         
         // Listen for form events
-        $(document).on('form_loaded', function(e, frm) {
+        $(document).on('form_loaded', function(_event, frm) {
             console.log('📋 Form loaded event:', frm.doctype, 'docname:', frm.docname);
             if (frm && frm.doctype) {
                 setTimeout(function() {
@@ -135,8 +220,8 @@
                 }, 100);
             }
         });
-        
-        $(document).on('form_refresh', function(e, frm) {
+
+        $(document).on('form_refresh', function(_event, frm) {
             console.log('🔄 Form refresh event:', frm.doctype, 'docname:', frm.docname);
             if (frm && frm.doctype) {
                 setTimeout(function() {

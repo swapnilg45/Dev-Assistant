@@ -38,6 +38,7 @@ class FieldAccessControl(Document):
 	def validate(self):
 		self.validate_configurations()
 		self.validate_user_exceptions()
+		self.validate_child_table_configurations()
 	
 	def validate_configurations(self):
 		"""Validate field configurations"""
@@ -62,6 +63,18 @@ class FieldAccessControl(Document):
 			if exception.user in users:
 				frappe.throw(_("Duplicate user found in exceptions: {0}").format(exception.user))
 			users.append(exception.user)
+	
+	def validate_child_table_configurations(self):
+		"""Validate child table configurations - no duplicate table fieldnames"""
+		if not self.child_table_configurations:
+			return
+		
+		# Check for duplicate table fieldnames
+		table_fieldnames = []
+		for config in self.child_table_configurations:
+			if config.table_fieldname in table_fieldnames:
+				frappe.throw(_("Duplicate child table configuration found for table: {0}").format(config.table_fieldname))
+			table_fieldnames.append(config.table_fieldname)
 
 
 
@@ -88,6 +101,27 @@ def get_doctype_fields(doctype_name):
 		return fields
 	except Exception as e:
 		frappe.log_error(f"Error getting fields for doctype {doctype_name}: {str(e)}")
+		return []
+
+@frappe.whitelist()
+def get_child_table_fields(doctype_name):
+	"""Get child table fields for a given doctype"""
+	try:
+		meta = frappe.get_meta(doctype_name)
+		child_tables = []
+		
+		for field in meta.fields:
+			if field.fieldtype == 'Table':
+				child_tables.append({
+					'fieldname': field.fieldname,
+					'label': field.label,
+					'fieldtype': field.fieldtype,
+					'options': field.options
+				})
+		
+		return child_tables
+	except Exception as e:
+		frappe.log_error(f"Error getting child table fields for doctype {doctype_name}: {str(e)}")
 		return []
 
 def is_user_excepted(config_name, user):
@@ -199,7 +233,7 @@ def get_active_configurations(doctype_name=None, role=None, docname=None):
 		configurations = frappe.get_all(
 			'Field Access Control',
 			filters=filters,
-			fields=['name', 'doctype_name', 'role', 'apply_to_all_roles', 'docname_filter', 'docname_pattern', 'specific_docname', 'custom_condition']
+			fields=['name', 'doctype_name', 'role', 'apply_to_all_roles', 'docname_filter', 'docname_pattern', 'specific_docname', 'custom_condition', 'enable_child_table_control']
 		)
 		
 		# Filter configurations based on docname and user exceptions
@@ -222,6 +256,21 @@ def get_active_configurations(doctype_name=None, role=None, docname=None):
 					fields=['fieldname', 'field_label', 'action_type', 'is_active']
 				)
 				config.field_configurations = field_configs
+				
+				# Get child table configurations if enabled
+				if config.enable_child_table_control:
+					child_table_configs = frappe.get_all(
+						'Child Table Button Configuration',
+						filters={
+							'parent': config.name,
+							'is_active': 1
+						},
+						fields=['table_fieldname', 'table_label', 'hide_add_button', 'hide_delete_button', 'is_active']
+					)
+					config.child_table_configurations = child_table_configs
+				else:
+					config.child_table_configurations = []
+				
 				filtered_configurations.append(config)
 		
 		return filtered_configurations
