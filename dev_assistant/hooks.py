@@ -139,13 +139,11 @@ doctype_js = {
 # ---------------
 # Hook on document methods and events
 
-# doc_events = {
-# 	"*": {
-# 		"on_update": "method",
-# 		"on_cancel": "method",
-# 		"on_trash": "method"
-# 	}
-# }
+doc_events = {
+	"*": {
+		"validate": "dev_assistant.dev_assistant.mandatory_field_validation.validator.validate_mandatory_fields"
+	}
+}
 
 # Scheduled Tasks
 # ---------------

@@ -1,0 +1,47 @@
+{
+ "actions": [],
+ "creation": "2024-09-16 15:30:00.000000",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "field_name",
+  "field_label",
+  "custom_error_message"
+ ],
+ "fields": [
+  {
+   "fieldname": "field_name",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Field Name",
+   "reqd": 1
+  },
+  {
+   "fieldname": "field_label",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Field Label",
+   "read_only": 1
+  },
+  {
+   "fieldname": "custom_error_message",
+   "fieldtype": "Data",
+   "label": "Custom Error Message",
+   "description": "Leave blank for default message"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "istable": 1,
+ "links": [],
+ "modified": "2024-09-16 15:30:00.000000",
+ "modified_by": "Administrator",
+ "module": "Dev Assistant",
+ "name": "Mandatory Field Detail",
+ "owner": "Administrator",
+ "permissions": [],
+ "quick_entry": 1,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "track_changes": 1
+}
