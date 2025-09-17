@@ -1,5 +1,6 @@
 {
  "actions": [],
+ "allow_import": 1,
  "autoname": "format:{document_type}-{YY}-{#####}",
  "creation": "2024-09-16 15:30:00",
  "doctype": "DocType",
@@ -63,7 +64,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-09-16 16:54:51.152424",
+ "modified": "2025-09-17 10:06:42.244825",
  "modified_by": "Administrator",
  "module": "Dev Assistant",
  "name": "Mandatory Field Controller",
