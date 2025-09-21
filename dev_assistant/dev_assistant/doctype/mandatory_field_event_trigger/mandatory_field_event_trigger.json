@@ -1,0 +1,63 @@
+{
+ "actions": [],
+ "creation": "2025-09-20 10:00:00",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "event_type",
+  "enabled",
+  "execution_order",
+  "condition_mode",
+  "description"
+ ],
+ "fields": [
+  {
+   "fieldname": "event_type",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Event Type",
+   "options": "before_insert\nafter_insert\nbefore_validate\nvalidate\nafter_validate\nbefore_save\nafter_save\nbefore_submit\nafter_submit\nbefore_update_after_submit\nafter_update_after_submit\nbefore_cancel\nafter_cancel\nbefore_delete\nafter_delete\non_change\non_update",
+   "reqd": 1
+  },
+  {
+   "default": "1",
+   "fieldname": "enabled",
+   "fieldtype": "Check",
+   "in_list_view": 1,
+   "label": "Enabled"
+  },
+  {
+   "default": "100",
+   "description": "Order of execution within the event",
+   "fieldname": "execution_order",
+   "fieldtype": "Int",
+   "label": "Execution Order"
+  },
+  {
+   "default": "Always",
+   "fieldname": "condition_mode",
+   "fieldtype": "Select",
+   "label": "Condition Mode",
+   "options": "Always\nConditional\nField Changed"
+  },
+  {
+   "fieldname": "description",
+   "fieldtype": "Small Text",
+   "label": "Event Description"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "istable": 1,
+ "links": [],
+ "modified": "2025-09-20 10:00:00",
+ "modified_by": "Administrator",
+ "module": "Dev Assistant",
+ "name": "Mandatory Field Event Trigger",
+ "owner": "Administrator",
+ "permissions": [],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "track_changes": 1
+}

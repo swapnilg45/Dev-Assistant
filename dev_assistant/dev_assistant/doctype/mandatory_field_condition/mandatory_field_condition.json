@@ -5,32 +5,77 @@
  "editable_grid": 1,
  "engine": "InnoDB",
  "field_order": [
+  "condition_type",
   "field",
   "condition",
-  "value"
+  "value",
+  "previous_value",
+  "role_name",
+  "custom_script",
+  "negate_condition"
  ],
  "fields": [
   {
+   "default": "Field Value",
+   "fieldname": "condition_type",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Condition Type",
+   "options": "Field Value\nField Changed\nRole Check\nCustom Script",
+   "reqd": 1
+  },
+  {
+   "depends_on": "eval:in_list(['Field Value', 'Field Changed'], doc.condition_type)",
    "fieldname": "field",
    "fieldtype": "Select",
    "in_list_view": 1,
    "label": "Field",
-   "reqd": 1
+   "mandatory_depends_on": "eval:in_list(['Field Value', 'Field Changed'], doc.condition_type)"
   },
   {
+   "depends_on": "eval:doc.condition_type != 'Custom Script'",
    "fieldname": "condition",
    "fieldtype": "Select",
    "in_list_view": 1,
    "label": "Condition",
-   "options": "=\n!=\n>\n<\n>=\n<=\nin\nnot in",
-   "reqd": 1
+   "options": "=\n!=\n>\n<\n>=\n<=\nin\nnot in\nlike\nnot like\nis set\nis not set\nchanged\nchanged from\nchanged to",
+   "mandatory_depends_on": "eval:doc.condition_type != 'Custom Script'"
   },
   {
+   "depends_on": "eval:doc.condition_type != 'Custom Script' && !in_list(['is set', 'is not set', 'changed'], doc.condition)",
    "fieldname": "value",
    "fieldtype": "Data",
    "in_list_view": 1,
-   "label": "Value",
-   "reqd": 1
+   "label": "Value"
+  },
+  {
+   "depends_on": "eval:doc.condition == 'changed from'",
+   "description": "Previous value for change comparison",
+   "fieldname": "previous_value",
+   "fieldtype": "Data",
+   "label": "Previous Value"
+  },
+  {
+   "depends_on": "eval:doc.condition_type == 'Role Check'",
+   "fieldname": "role_name",
+   "fieldtype": "Link",
+   "label": "Role Name",
+   "options": "Role"
+  },
+  {
+   "depends_on": "eval:doc.condition_type == 'Custom Script'",
+   "description": "Return True if condition is met. Available variables: doc, user",
+   "fieldname": "custom_script",
+   "fieldtype": "Code",
+   "label": "Custom Script",
+   "options": "Python"
+  },
+  {
+   "default": "0",
+   "description": "Reverse the condition result",
+   "fieldname": "negate_condition",
+   "fieldtype": "Check",
+   "label": "Negate Condition"
   }
  ],
  "index_web_pages_for_search": 1,

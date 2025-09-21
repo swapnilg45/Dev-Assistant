@@ -1,20 +1,60 @@
 frappe.ui.form.on('Mandatory Field Controller', {
 	refresh: function(frm) {
+		// Add status indicator
+		render_status_indicator(frm);
+
 		// Update field options on form load
 		if (frm.doc.document_type) {
 			update_field_options(frm);
 		}
 
-		// Add bulk selection button for mandatory fields
-		if (frm.doc.document_type && !frm.is_new()) {
-			frm.add_custom_button(__('Bulk Add Fields'), function() {
-				show_bulk_field_selector(frm);
-			}, __('Actions'));
+		// Add action buttons for enhanced UX
+		if (!frm.is_new()) {
+			// Primary Actions
+			if (frm.doc.document_type) {
+				frm.add_custom_button(__('Bulk Add Fields'), function() {
+					show_bulk_field_selector(frm);
+				}, __('Actions'));
 
-			frm.add_custom_button(__('Smart Add Conditions'), function() {
-				show_smart_condition_builder(frm);
-			}, __('Actions'));
+				frm.add_custom_button(__('Smart Add Conditions'), function() {
+					show_smart_condition_builder(frm);
+				}, __('Actions'));
+
+				frm.add_custom_button(__('Test Validation'), function() {
+					show_validation_tester(frm);
+				}, __('Actions'));
+
+				frm.add_custom_button(__('Quick Setup Wizard'), function() {
+					show_setup_wizard(frm);
+				}, __('Actions'));
+			}
+
+			// Secondary Actions
+			frm.add_custom_button(__('View Analytics'), function() {
+				frappe.set_route('query-report', 'Mandatory Field Analytics');
+			}, __('Reports'));
+
+			frm.add_custom_button(__('Impact Analysis'), function() {
+				show_impact_analysis(frm);
+			}, __('Reports'));
+
+			frm.add_custom_button(__('Clone Rule'), function() {
+				clone_validation_rule(frm);
+			}, __('Utilities'));
+
+			frm.add_custom_button(__('Export Configuration'), function() {
+				export_configuration(frm);
+			}, __('Utilities'));
 		}
+
+		// Add help section
+		if (!frm.help_section_added) {
+			add_help_section(frm);
+			frm.help_section_added = true;
+		}
+
+		// Add role-based UI customization
+		apply_role_based_ui(frm);
 	},
 
 	document_type: function(frm) {
@@ -31,7 +71,28 @@ frappe.ui.form.on('Mandatory Field Controller', {
 
 			// Update field options
 			update_field_options(frm);
+
+			// Show field statistics
+			show_doctype_field_stats(frm);
+
+			// Load template suggestions
+			load_template_suggestions(frm);
 		}
+	},
+
+	execution_mode: function(frm) {
+		// Update UI based on execution mode
+		update_execution_mode_ui(frm);
+	},
+
+	priority: function(frm) {
+		// Update priority indicator
+		update_priority_indicator(frm);
+	},
+
+	enabled: function(frm) {
+		// Update status indicator
+		render_status_indicator(frm);
 	}
 });
 
@@ -1007,6 +1068,165 @@ function show_dialog_suggestions_popup(suggestions, input_element, title) {
 	$(document).one('keydown', function(e) {
 		if (e.key === 'Escape') {
 			popup.remove();
+		}
+	});
+}
+// Missing function implementations
+function render_status_indicator(frm) {
+	if (!frm.doc.name) return;
+
+	let indicator = frm.doc.enabled ? 'green' : 'red';
+	let text = frm.doc.enabled ? 'Active' : 'Disabled';
+
+	frm.page.set_indicator(text, indicator);
+}
+
+function show_validation_tester(frm) {
+	let d = new frappe.ui.Dialog({
+		title: __('Test Validation Rules'),
+		fields: [
+			{
+				fieldtype: 'HTML',
+				fieldname: 'test_info',
+				options: `
+					<div class="alert alert-info">
+						<strong>Test Mode:</strong> Test your validation rules with sample data
+					</div>
+				`
+			},
+			{
+				fieldtype: 'Select',
+				fieldname: 'test_mode',
+				label: __('Test Mode'),
+				options: 'Sample Data\nExisting Document',
+				default: 'Sample Data',
+				reqd: 1
+			},
+			{
+				fieldtype: 'Link',
+				fieldname: 'test_document',
+				label: __('Test Document'),
+				options: frm.doc.document_type,
+				depends_on: 'eval:doc.test_mode=="Existing Document"'
+			},
+			{
+				fieldtype: 'Code',
+				fieldname: 'test_data',
+				label: __('Test Data (JSON)'),
+				depends_on: 'eval:doc.test_mode=="Sample Data"',
+				options: 'JSON'
+			}
+		],
+		primary_action_label: __('Run Test'),
+		primary_action: function() {
+			let values = d.get_values();
+
+			frappe.call({
+				method: 'dev_assistant.dev_assistant.doctype.mandatory_field_controller.mandatory_field_controller.test_validation_rules',
+				args: {
+					controller_name: frm.doc.name,
+					test_data: values.test_data || '{}'
+				},
+				callback: function(r) {
+					if (r.message) {
+						let result = r.message;
+						let status = result.conditions_met ? 'Success' : 'Failed';
+						let color = result.conditions_met ? 'green' : 'red';
+
+						frappe.msgprint({
+							title: __('Test Result'),
+							message: `
+								<div style="margin-bottom: 15px;">
+									<span class="indicator ${color}">${status}</span>
+								</div>
+								<p><strong>Conditions Met:</strong> ${result.conditions_met ? 'Yes' : 'No'}</p>
+								<p><strong>Mandatory Fields:</strong> ${result.mandatory_fields.length}</p>
+								${result.failed_conditions.length ?
+									`<p><strong>Failed Conditions:</strong> ${result.failed_conditions.length}</p>` : ''
+								}
+							`,
+							indicator: color
+						});
+					}
+				}
+			});
+			d.hide();
+		}
+	});
+
+	d.show();
+}
+
+function show_setup_wizard(frm) {
+	frappe.msgprint({
+		title: __('Setup Wizard'),
+		message: __('Quick setup wizard will be available in the next update. For now, use the form fields to configure your validation rules.'),
+		indicator: 'blue'
+	});
+}
+
+function show_impact_analysis(frm) {
+	frappe.call({
+		method: 'dev_assistant.dev_assistant.doctype.mandatory_field_controller.mandatory_field_controller.get_impact_analysis',
+		args: {
+			controller_name: frm.doc.name,
+			document_type: frm.doc.document_type
+		},
+		callback: function(r) {
+			if (r.message) {
+				let data = r.message;
+				frappe.msgprint({
+					title: __('Impact Analysis'),
+					message: `
+						<div class="impact-analysis">
+							<h5>Document Impact</h5>
+							<p><strong>Total Documents:</strong> ${data.total_documents}</p>
+							<p><strong>Affected Documents:</strong> ${data.affected_documents}</p>
+							<p><strong>Already Compliant:</strong> ${data.compliant_documents}</p>
+
+							<h5>User Impact</h5>
+							<p><strong>Affected Users:</strong> ${data.affected_users.length}</p>
+							${data.affected_users.length ?
+								`<ul>${data.affected_users.map(user => `<li>${user}</li>`).join('')}</ul>` : ''
+							}
+						</div>
+					`,
+					indicator: 'blue'
+				});
+			}
+		}
+	});
+}
+
+function clone_validation_rule(frm) {
+	frappe.route_options = {
+		"document_type": frm.doc.document_type,
+		"execution_mode": frm.doc.execution_mode,
+		"priority": frm.doc.priority,
+		"enabled": 0
+	};
+	frappe.new_doc("Mandatory Field Controller");
+}
+
+function export_configuration(frm) {
+	frappe.call({
+		method: 'dev_assistant.dev_assistant.doctype.mandatory_field_controller.mandatory_field_controller.export_all_configurations',
+		callback: function(r) {
+			if (r.message) {
+				let data = JSON.stringify(r.message, null, 2);
+				let blob = new Blob([data], {type: 'application/json'});
+				let url = URL.createObjectURL(blob);
+				let a = document.createElement('a');
+				a.href = url;
+				a.download = 'mandatory_field_configurations.json';
+				a.click();
+				URL.revokeObjectURL(url);
+
+				frappe.show_alert({
+					message: __('Configuration exported successfully'),
+					indicator: 'green'
+				});
+			}
 		}
 	});
 }

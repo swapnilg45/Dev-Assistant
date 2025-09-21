@@ -7,14 +7,20 @@
  "field_order": [
   "field_name",
   "field_label",
-  "custom_error_message"
+  "validation_type",
+  "custom_error_message",
+  "validation_script",
+  "format_pattern",
+  "min_length",
+  "max_length"
  ],
  "fields": [
   {
    "fieldname": "field_name",
    "fieldtype": "Select",
    "in_list_view": 1,
-   "label": "Field Name"
+   "label": "Field Name",
+   "reqd": 1
   },
   {
    "fieldname": "field_label",
@@ -24,10 +30,45 @@
    "read_only": 1
   },
   {
+   "default": "Required",
+   "fieldname": "validation_type",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Validation Type",
+   "options": "Required\nConditionally Required\nFormat Validation\nCustom Validation"
+  },
+  {
    "description": "Leave blank for default message",
    "fieldname": "custom_error_message",
    "fieldtype": "Data",
    "label": "Custom Error Message"
+  },
+  {
+   "depends_on": "eval:doc.validation_type == 'Custom Validation'",
+   "description": "Python script that returns True if valid. Available: value, doc, user",
+   "fieldname": "validation_script",
+   "fieldtype": "Code",
+   "label": "Validation Script",
+   "options": "Python"
+  },
+  {
+   "depends_on": "eval:doc.validation_type == 'Format Validation'",
+   "description": "Regular expression pattern for format validation",
+   "fieldname": "format_pattern",
+   "fieldtype": "Data",
+   "label": "Format Pattern"
+  },
+  {
+   "depends_on": "eval:doc.validation_type == 'Format Validation'",
+   "fieldname": "min_length",
+   "fieldtype": "Int",
+   "label": "Min Length"
+  },
+  {
+   "depends_on": "eval:doc.validation_type == 'Format Validation'",
+   "fieldname": "max_length",
+   "fieldtype": "Int",
+   "label": "Max Length"
   }
  ],
  "index_web_pages_for_search": 1,

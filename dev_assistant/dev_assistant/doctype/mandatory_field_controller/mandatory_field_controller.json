@@ -1,7 +1,7 @@
 {
  "actions": [],
  "allow_import": 1,
- "autoname": "format:{document_type}-{YY}-{#####}",
+ "autoname": "format:{document_type}-{execution_mode}-{YY}-{#####}",
  "creation": "2024-09-16 15:30:00",
  "doctype": "DocType",
  "editable_grid": 1,
@@ -10,10 +10,21 @@
   "document_type",
   "disabled",
   "priority",
+  "execution_mode",
+  "section_break_events",
+  "event_triggers",
+  "section_break_field_monitoring",
+  "monitored_fields",
   "section_break_conditions",
+  "condition_logic",
+  "custom_condition_script",
   "conditions",
   "section_break_fields",
-  "mandatory_fields"
+  "mandatory_fields",
+  "section_break_advanced",
+  "apply_to_child_tables",
+  "error_handling_mode",
+  "bypass_roles"
  ],
  "fields": [
   {
@@ -38,11 +49,60 @@
    "label": "Priority"
   },
   {
+   "default": "Event Based",
+   "fieldname": "execution_mode",
+   "fieldtype": "Select",
+   "label": "Execution Mode",
+   "options": "Event Based\nField Change Based\nCombined",
+   "reqd": 1
+  },
+  {
+   "fieldname": "section_break_events",
+   "fieldtype": "Section Break",
+   "label": "Event Configuration"
+  },
+  {
+   "depends_on": "eval:in_list(['Event Based', 'Combined'], doc.execution_mode)",
+   "fieldname": "event_triggers",
+   "fieldtype": "Table",
+   "label": "Event Triggers",
+   "options": "Mandatory Field Event Trigger"
+  },
+  {
+   "depends_on": "eval:in_list(['Field Change Based', 'Combined'], doc.execution_mode)",
+   "fieldname": "section_break_field_monitoring",
+   "fieldtype": "Section Break",
+   "label": "Field Change Monitoring"
+  },
+  {
+   "depends_on": "eval:in_list(['Field Change Based', 'Combined'], doc.execution_mode)",
+   "fieldname": "monitored_fields",
+   "fieldtype": "Table",
+   "label": "Monitored Fields",
+   "options": "Mandatory Field Monitor"
+  },
+  {
    "collapsible": 1,
    "collapsible_depends_on": "conditions",
    "fieldname": "section_break_conditions",
    "fieldtype": "Section Break",
    "label": "Rule Conditions"
+  },
+  {
+   "default": "AND",
+   "description": "How to combine multiple conditions",
+   "fieldname": "condition_logic",
+   "fieldtype": "Select",
+   "label": "Condition Logic",
+   "options": "AND\nOR\nCustom"
+  },
+  {
+   "depends_on": "eval:doc.condition_logic=='Custom'",
+   "description": "Custom Python script for complex condition logic",
+   "fieldname": "custom_condition_script",
+   "fieldtype": "Code",
+   "label": "Custom Condition Script",
+   "options": "Python"
   },
   {
    "fieldname": "conditions",
@@ -60,6 +120,33 @@
    "fieldtype": "Table",
    "label": "Make these fields mandatory",
    "options": "Mandatory Field Detail"
+  },
+  {
+   "collapsible": 1,
+   "fieldname": "section_break_advanced",
+   "fieldtype": "Section Break",
+   "label": "Advanced Settings"
+  },
+  {
+   "default": "0",
+   "description": "Apply validation to child table records",
+   "fieldname": "apply_to_child_tables",
+   "fieldtype": "Check",
+   "label": "Apply to Child Tables"
+  },
+  {
+   "default": "Collect All Errors",
+   "fieldname": "error_handling_mode",
+   "fieldtype": "Select",
+   "label": "Error Handling Mode",
+   "options": "Stop on First Error\nCollect All Errors\nWarning Only"
+  },
+  {
+   "description": "Roles that can bypass this validation",
+   "fieldname": "bypass_roles",
+   "fieldtype": "Table",
+   "label": "Bypass Roles",
+   "options": "Mandatory Field Bypass Role"
   }
  ],
  "index_web_pages_for_search": 1,

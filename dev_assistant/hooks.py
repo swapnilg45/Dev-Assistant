@@ -25,7 +25,7 @@ app_license = "mit"
 # ------------------
 
 # include js, css files in header of desk.html
-# app_include_css = "/assets/dev_assistant/css/dev_assistant.css"
+app_include_css = "/assets/dev_assistant/css/mandatory_field_enhancements.css"
 app_include_js = "/assets/dev_assistant/js/field_access_control.js"
 
 # include js, css files in header of web template
@@ -141,7 +141,23 @@ doctype_js = {
 
 doc_events = {
 	"*": {
-		"validate": "dev_assistant.dev_assistant.mandatory_field_validation.validator.validate_mandatory_fields"
+		# Enhanced event handlers for mandatory field validation
+		"before_insert": "dev_assistant.dev_assistant.mandatory_field_validation.validator.validate_mandatory_fields",
+		"after_insert": "dev_assistant.dev_assistant.mandatory_field_validation.validator.validate_mandatory_fields",
+		"before_validate": "dev_assistant.dev_assistant.mandatory_field_validation.validator.validate_mandatory_fields",
+		"validate": "dev_assistant.dev_assistant.mandatory_field_validation.validator.validate_mandatory_fields",
+		"after_validate": "dev_assistant.dev_assistant.mandatory_field_validation.validator.validate_mandatory_fields",
+		"before_save": "dev_assistant.dev_assistant.mandatory_field_validation.validator.validate_mandatory_fields",
+		"after_save": "dev_assistant.dev_assistant.mandatory_field_validation.validator.validate_mandatory_fields",
+		"before_submit": "dev_assistant.dev_assistant.mandatory_field_validation.validator.validate_mandatory_fields",
+		"on_submit": "dev_assistant.dev_assistant.mandatory_field_validation.validator.validate_mandatory_fields",
+		"before_update_after_submit": "dev_assistant.dev_assistant.mandatory_field_validation.validator.validate_mandatory_fields",
+		"on_update_after_submit": "dev_assistant.dev_assistant.mandatory_field_validation.validator.validate_mandatory_fields",
+		"on_cancel": "dev_assistant.dev_assistant.mandatory_field_validation.validator.validate_mandatory_fields",
+		"on_trash": "dev_assistant.dev_assistant.mandatory_field_validation.validator.validate_mandatory_fields",
+		"after_delete": "dev_assistant.dev_assistant.mandatory_field_validation.validator.validate_mandatory_fields",
+		"on_update": "dev_assistant.dev_assistant.mandatory_field_validation.validator.validate_mandatory_fields",
+		"on_change": "dev_assistant.dev_assistant.mandatory_field_validation.validator.validate_mandatory_fields"
 	}
 }
 
