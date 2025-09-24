@@ -1,0 +1,146 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "naming_series:",
+ "creation": "2025-09-23 15:30:00.000000",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "basic_information_section",
+  "chain_name",
+  "description",
+  "column_break_3",
+  "is_active",
+  "template_used",
+  "naming_series",
+  "chain_configuration_section",
+  "chain_steps",
+  "simple_settings_section",
+  "sync_frequency",
+  "column_break_8",
+  "conflict_resolution"
+ ],
+ "fields": [
+  {
+   "fieldname": "basic_information_section",
+   "fieldtype": "Section Break",
+   "label": "Basic Information"
+  },
+  {
+   "fieldname": "chain_name",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Process Name",
+   "reqd": 1,
+   "description": "e.g., 'Lead to Sales Order', 'Hiring Process'"
+  },
+  {
+   "fieldname": "description",
+   "fieldtype": "Small Text",
+   "label": "Description",
+   "description": "What does this process do?"
+  },
+  {
+   "fieldname": "column_break_3",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "is_active",
+   "fieldtype": "Check",
+   "label": "Active",
+   "default": 1,
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "template_used",
+   "fieldtype": "Data",
+   "label": "Created from Template",
+   "read_only": 1,
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "naming_series",
+   "fieldtype": "Select",
+   "label": "Naming Series",
+   "options": "CHAIN-.####",
+   "default": "CHAIN-.####",
+   "reqd": 1
+  },
+  {
+   "fieldname": "chain_configuration_section",
+   "fieldtype": "Section Break",
+   "label": "Process Steps"
+  },
+  {
+   "fieldname": "chain_steps",
+   "fieldtype": "Table",
+   "label": "Process Steps",
+   "options": "Sync Chain Step",
+   "reqd": 1
+  },
+  {
+   "fieldname": "simple_settings_section",
+   "fieldtype": "Section Break",
+   "label": "Sync Settings"
+  },
+  {
+   "fieldname": "sync_frequency",
+   "fieldtype": "Select",
+   "label": "When to Sync",
+   "options": "Immediately\nEvery Hour\nDaily\nManual Only",
+   "default": "Immediately",
+   "reqd": 1
+  },
+  {
+   "fieldname": "column_break_8",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "conflict_resolution",
+   "fieldtype": "Select",
+   "label": "When Data Conflicts",
+   "options": "Use Latest Data\nAsk Me to Review\nKeep Original Data",
+   "default": "Use Latest Data",
+   "reqd": 1
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2025-09-23 15:30:00.000000",
+ "modified_by": "Administrator",
+ "module": "Dev Assistant",
+ "name": "Sync Chain",
+ "naming_rule": "By Naming Series",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Sync Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "title_field": "chain_name",
+ "track_changes": 1
+}

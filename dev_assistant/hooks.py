@@ -11,22 +11,32 @@ app_license = "mit"
 # required_apps = []
 
 # Each item in the list will be shown as an app in the apps page
-# add_to_apps_screen = [
-# 	{
-# 		"name": "dev_assistant",
-# 		"logo": "/assets/dev_assistant/logo.png",
-# 		"title": "Dev Assistant",
-# 		"route": "/dev_assistant",
-# 		"has_permission": "dev_assistant.api.permission.has_app_permission"
-# 	}
-# ]
+add_to_apps_screen = [
+	{
+		"name": "dev_assistant",
+		"logo": "/assets/dev_assistant/images/logo.png",
+		"title": "Universal Data Sync",
+		"route": "/universal-sync",
+		"has_permission": "dev_assistant.api.permission.has_app_permission"
+	}
+]
 
 # Includes in <head>
 # ------------------
 
 # include js, css files in header of desk.html
 # app_include_css = "/assets/dev_assistant/css/dev_assistant.css"
-app_include_js = "/assets/dev_assistant/js/field_access_control.js"
+app_include_js = [
+	"/assets/dev_assistant/js/field_access_control.js",
+	"/assets/dev_assistant/js/field_mapping_interface.js",
+	"/assets/dev_assistant/js/template_selector.js",
+	"/assets/dev_assistant/js/visual_workflow_builder.js",
+	"/assets/dev_assistant/js/sync_test_interface.js"
+]
+
+# Vue.js Frontend Assets
+app_include_css = "/assets/dev_assistant/frontend/assets/index.css"
+web_include_js = "/assets/dev_assistant/frontend/assets/index.js"
 
 # include js, css files in header of web template
 # web_include_css = "/assets/dev_assistant/css/dev_assistant.css"
@@ -72,6 +82,16 @@ doctype_js = {
 # automatically create page for each record of this doctype
 # website_generators = ["Web Page"]
 
+# Website
+# --------
+
+website_route_rules = [
+	{"from_route": "/universal-sync", "to_route": "universal-sync"},
+	{"from_route": "/universal-sync/<path:path>", "to_route": "universal-sync"},
+	{"from_route": "/sync", "to_route": "universal-sync"},
+	{"from_route": "/dev-assistant", "to_route": "universal-sync"},
+]
+
 # Jinja
 # ----------
 
@@ -85,7 +105,7 @@ doctype_js = {
 # ------------
 
 # before_install = "dev_assistant.install.before_install"
-# after_install = "dev_assistant.install.after_install"
+after_install = "dev_assistant.dev_assistant.universal_sync.install.after_install"
 
 # Uninstallation
 # ------------
@@ -141,30 +161,24 @@ doctype_js = {
 
 doc_events = {
 	"*": {
-		"validate": "dev_assistant.dev_assistant.mandatory_field_validation.validator.validate_mandatory_fields"
+		"validate": "dev_assistant.dev_assistant.mandatory_field_validation.validator.validate_mandatory_fields",
+		"on_update": "dev_assistant.dev_assistant.universal_sync.sync_engine.sync_on_document_event",
+		"on_submit": "dev_assistant.dev_assistant.universal_sync.sync_engine.sync_on_document_event",
+		"on_update_after_submit": "dev_assistant.dev_assistant.universal_sync.sync_engine.sync_on_document_event"
 	}
 }
 
 # Scheduled Tasks
 # ---------------
 
-# scheduler_events = {
-# 	"all": [
-# 		"dev_assistant.tasks.all"
-# 	],
-# 	"daily": [
-# 		"dev_assistant.tasks.daily"
-# 	],
-# 	"hourly": [
-# 		"dev_assistant.tasks.hourly"
-# 	],
-# 	"weekly": [
-# 		"dev_assistant.tasks.weekly"
-# 	],
-# 	"monthly": [
-# 		"dev_assistant.tasks.monthly"
-# 	],
-# }
+scheduler_events = {
+	"hourly": [
+		"dev_assistant.dev_assistant.universal_sync.sync_engine.scheduled_sync"
+	],
+	"daily": [
+		"dev_assistant.dev_assistant.universal_sync.sync_engine.daily_sync_cleanup"
+	]
+}
 
 # Testing
 # -------

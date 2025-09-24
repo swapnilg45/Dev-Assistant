@@ -1,0 +1,26 @@
+{
+ "content": null,
+ "creation": "2025-09-23 15:30:00.000000",
+ "docstatus": 0,
+ "doctype": "Page",
+ "idx": 0,
+ "modified": "2025-09-23 15:30:00.000000",
+ "modified_by": "Administrator",
+ "module": "Dev Assistant",
+ "name": "sync-setup-wizard",
+ "owner": "Administrator",
+ "page_name": "Sync Setup Wizard",
+ "roles": [
+  {
+   "role": "System Manager"
+  },
+  {
+   "role": "Sync Manager"
+  }
+ ],
+ "script": null,
+ "standard": "Yes",
+ "style": null,
+ "system_page": 0,
+ "title": "Sync Setup Wizard"
+}
