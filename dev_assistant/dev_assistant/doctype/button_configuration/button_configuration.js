@@ -121,40 +121,153 @@ function get_doctype_fields(frm) {
         },
         callback: function(r) {
             if (r.message && r.message.length > 0) {
-                // Create a dialog to show fields
-                const fields_html = r.message.map(field => {
-                    return `
-                        <tr>
-                            <td><code>${field.fieldname}</code></td>
-                            <td>${field.label}</td>
-                            <td>${field.fieldtype}</td>
-                            <td>${field.options || '-'}</td>
-                        </tr>
-                    `;
-                }).join('');
-
-                const message = `
-                    <h5>Available Fields for ${frm.doc.target_doctype}</h5>
-                    <table class="table table-bordered">
-                        <thead>
-                            <tr>
-                                <th>Field Name</th>
-                                <th>Label</th>
-                                <th>Type</th>
-                                <th>Options</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            ${fields_html}
-                        </tbody>
-                    </table>
-                `;
-
-                frappe.msgprint({
-                    title: __('DocType Fields'),
-                    message: message,
-                    wide: true
+                // Create a proper dialog instead of msgprint
+                const dialog = new frappe.ui.Dialog({
+                    title: __('Available Fields for {0}', [frm.doc.target_doctype]),
+                    size: 'large',
+                    fields: [
+                        {
+                            fieldname: 'search_field',
+                            fieldtype: 'Data',
+                            label: 'Search Fields',
+                            placeholder: 'Type to filter fields...'
+                        },
+                        {
+                            fieldname: 'fields_html',
+                            fieldtype: 'HTML'
+                        }
+                    ]
                 });
+
+                // Build responsive field cards
+                const buildFieldsHTML = (fields, searchTerm = '') => {
+                    const filteredFields = fields.filter(field => {
+                        if (!searchTerm) return true;
+                        const term = searchTerm.toLowerCase();
+                        return field.fieldname.toLowerCase().includes(term) ||
+                               (field.label && field.label.toLowerCase().includes(term)) ||
+                               field.fieldtype.toLowerCase().includes(term);
+                    });
+
+                    if (filteredFields.length === 0) {
+                        return '<p class="text-muted text-center">No fields found matching your search.</p>';
+                    }
+
+                    return `
+                        <div class="row">
+                            ${filteredFields.map(field => `
+                                <div class="col-md-6 col-lg-4 mb-3">
+                                    <div class="card h-100 border-light shadow-sm field-card" data-fieldname="${field.fieldname}" data-fieldtype="${field.fieldtype}" data-label="${field.label}" style="cursor: pointer;">
+                                        <div class="card-body p-3">
+                                            <h6 class="card-title mb-2">
+                                                <code class="text-primary">${field.fieldname}</code>
+                                                <i class="fa fa-plus-circle text-success float-right" title="Click to add condition"></i>
+                                            </h6>
+                                            <p class="card-text mb-1">
+                                                <strong>Label:</strong> ${field.label || 'No Label'}
+                                            </p>
+                                            <p class="card-text mb-1">
+                                                <strong>Type:</strong>
+                                                <span class="badge badge-info">${field.fieldtype}</span>
+                                            </p>
+                                            ${field.options ? `
+                                                <p class="card-text mb-0">
+                                                    <strong>Options:</strong>
+                                                    <small class="text-muted">${field.options}</small>
+                                                </p>
+                                            ` : ''}
+                                        </div>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                        <div class="mt-3 text-center text-muted">
+                            <small>Showing ${filteredFields.length} of ${fields.length} fields</small>
+                        </div>
+                    `;
+                };
+
+                // Initial render
+                dialog.fields_dict.fields_html.$wrapper.html(buildFieldsHTML(r.message));
+
+                // Add search functionality
+                dialog.fields_dict.search_field.$input.on('input', function() {
+                    const searchTerm = $(this).val();
+                    dialog.fields_dict.fields_html.$wrapper.html(buildFieldsHTML(r.message, searchTerm));
+                    // Re-attach click handlers after re-render
+                    attachFieldClickHandlers();
+                });
+
+                // Add click functionality to field cards
+                function attachFieldClickHandlers() {
+                    dialog.fields_dict.fields_html.$wrapper.find('.field-card').off('click').on('click', function() {
+                        const fieldname = $(this).data('fieldname');
+                        const fieldtype = $(this).data('fieldtype');
+                        const label = $(this).data('label');
+
+                        // Add new row to conditions table
+                        const conditions_field = frm.get_field('conditions');
+                        const new_row = conditions_field.grid.add_new_row();
+
+                        // Set field name
+                        frappe.model.set_value(new_row.doctype, new_row.name, 'condition_field', fieldname);
+
+                        // Set default operator based on field type
+                        let default_operator = '=';
+                        if (fieldtype === 'Check') {
+                            default_operator = '=';
+                        } else if (fieldtype === 'Text' || fieldtype === 'Data') {
+                            default_operator = 'like';
+                        } else if (fieldtype === 'Date' || fieldtype === 'Datetime') {
+                            default_operator = '>=';
+                        }
+
+                        frappe.model.set_value(new_row.doctype, new_row.name, 'operator', default_operator);
+
+                        // Refresh the grid
+                        conditions_field.grid.refresh();
+
+                        // Show success message and close dialog
+                        frappe.show_alert({
+                            message: `Field "${fieldname}" added to conditions`,
+                            indicator: 'green'
+                        });
+
+                        dialog.hide();
+                    });
+                }
+
+                // Initial click handler attachment
+                attachFieldClickHandlers();
+
+                // Add custom CSS
+                dialog.$wrapper.find('.modal-dialog').addClass('modal-lg');
+                dialog.$wrapper.find('.fields_html').css({
+                    'max-height': '400px',
+                    'overflow-y': 'auto',
+                    'padding': '10px'
+                });
+
+                // Add hover effect CSS
+                const hoverCSS = `
+                    <style>
+                        .field-card:hover {
+                            transform: translateY(-2px);
+                            transition: transform 0.2s ease;
+                            border-color: #007bff !important;
+                        }
+                        .field-card .fa-plus-circle {
+                            opacity: 0.7;
+                            transition: opacity 0.2s ease;
+                        }
+                        .field-card:hover .fa-plus-circle {
+                            opacity: 1;
+                        }
+                    </style>
+                `;
+                dialog.$wrapper.find('.modal-header').after(hoverCSS);
+
+                dialog.show();
             } else {
                 frappe.msgprint(__('No fields found for this DocType'));
             }
