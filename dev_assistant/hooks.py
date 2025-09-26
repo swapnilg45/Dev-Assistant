@@ -26,17 +26,9 @@ add_to_apps_screen = [
 
 # include js, css files in header of desk.html
 # app_include_css = "/assets/dev_assistant/css/dev_assistant.css"
-app_include_js = [
-	"/assets/dev_assistant/js/field_access_control.js",
-	"/assets/dev_assistant/js/field_mapping_interface.js",
-	"/assets/dev_assistant/js/template_selector.js",
-	"/assets/dev_assistant/js/visual_workflow_builder.js",
-	"/assets/dev_assistant/js/sync_test_interface.js"
-]
+app_include_js = "/assets/dev_assistant/js/field_access_control.js"
 
-# Vue.js Frontend Assets
-app_include_css = "/assets/dev_assistant/frontend/assets/index.css"
-web_include_js = "/assets/dev_assistant/frontend/assets/index.js"
+# Vue.js Frontend Assets - Only loaded on specific pages, not globally
 
 # include js, css files in header of web template
 # web_include_css = "/assets/dev_assistant/css/dev_assistant.css"

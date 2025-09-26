@@ -138,3 +138,41 @@ def copy_role_permissions(source_role, target_role, overwrite_existing=False):
     except Exception as e:
         frappe.log_error(f"Error copying role permissions: {str(e)}")
         frappe.throw(_("Error copying role permissions: {0}").format(str(e)))
+
+
+@frappe.whitelist()
+def create_sync_chain_from_wizard(process_data, activate_immediately=True):
+    """Create sync chain from wizard data"""
+    import json
+    try:
+        # Parse process data if it's a string
+        if isinstance(process_data, str):
+            process_data = json.loads(process_data)
+
+        # Create new sync chain document
+        chain_doc = frappe.new_doc("Sync Chain")
+        chain_doc.chain_name = process_data.get("processName", "New Sync Process")
+        chain_doc.description = process_data.get("description", "")
+        chain_doc.is_active = 1 if activate_immediately else 0
+
+        # Set template reference
+        template_key = process_data.get("templateKey")
+        if template_key and template_key != "custom":
+            chain_doc.template_used = template_key
+
+        # Save the document
+        chain_doc.save()
+
+        return {
+            "success": True,
+            "message": f"Sync Chain '{chain_doc.chain_name}' created successfully!",
+            "chain_id": chain_doc.name,
+            "status": "created"
+        }
+
+    except Exception as e:
+        frappe.log_error(message=str(e), title="Sync Chain Creation Failed")
+        return {
+            "success": False,
+            "message": f"Failed to create sync process: {str(e)}"
+        }
