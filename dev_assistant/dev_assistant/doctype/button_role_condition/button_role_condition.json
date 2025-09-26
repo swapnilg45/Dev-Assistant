@@ -1,0 +1,49 @@
+{
+  "actions": [],
+  "creation": "2025-09-26 10:00:00.000000",
+  "doctype": "DocType",
+  "editable_grid": 1,
+  "engine": "InnoDB",
+  "field_order": [
+    "role",
+    "conditions",
+    "logical_operator"
+  ],
+  "fields": [
+    {
+      "fieldname": "role",
+      "fieldtype": "Link",
+      "in_list_view": 1,
+      "label": "Role",
+      "options": "Role",
+      "reqd": 1,
+      "description": "User role that can access this button"
+    },
+    {
+      "fieldname": "conditions",
+      "fieldtype": "Small Text",
+      "label": "Conditions",
+      "description": "Additional conditions for this role (JSON format)"
+    },
+    {
+      "fieldname": "logical_operator",
+      "fieldtype": "Select",
+      "label": "Logical Operator",
+      "options": "AND\nOR",
+      "default": "AND",
+      "description": "How to combine multiple conditions for this role"
+    }
+  ],
+  "index_web_pages_for_search": 1,
+  "istable": 1,
+  "links": [],
+  "modified": "2025-09-26 10:00:00.000000",
+  "modified_by": "Administrator",
+  "module": "Dev Assistant",
+  "name": "Button Role Condition",
+  "owner": "Administrator",
+  "permissions": [],
+  "sort_field": "modified",
+  "sort_order": "DESC",
+  "states": []
+}

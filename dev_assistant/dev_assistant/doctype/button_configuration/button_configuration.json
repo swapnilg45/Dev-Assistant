@@ -1,0 +1,172 @@
+{
+  "actions": [],
+  "allow_rename": 1,
+  "autoname": "format:{button_location}-{target_doctype}-{target_report}-{button_label}-{###}",
+  "creation": "2025-09-26 10:00:00.000000",
+  "doctype": "DocType",
+  "editable_grid": 1,
+  "engine": "InnoDB",
+  "field_order": [
+    "button_location",
+    "target_doctype",
+    "target_report",
+    "button_type",
+    "button_label",
+    "button_group",
+    "callback_function",
+    "section_break_conditions",
+    "conditions",
+    "section_break_role_permissions",
+    "allowed_roles",
+    "section_break_user_exceptions",
+    "user_exceptions",
+    "section_break_settings",
+    "is_active"
+  ],
+  "fields": [
+    {
+      "fieldname": "button_location",
+      "fieldtype": "Select",
+      "in_list_view": 1,
+      "label": "Button Location",
+      "options": "DocType Form\nReport",
+      "reqd": 1,
+      "description": "Select where the existing button is located"
+    },
+    {
+      "fieldname": "target_doctype",
+      "fieldtype": "Link",
+      "label": "Target DocType",
+      "options": "DocType",
+      "depends_on": "eval:doc.button_location=='DocType Form'",
+      "mandatory_depends_on": "eval:doc.button_location=='DocType Form'",
+      "in_list_view": 1,
+      "description": "Select the DocType containing the existing button (required for forms)"
+    },
+    {
+      "fieldname": "target_report",
+      "fieldtype": "Link",
+      "label": "Target Report",
+      "options": "Report",
+      "depends_on": "eval:doc.button_location=='Report'",
+      "mandatory_depends_on": "eval:doc.button_location=='Report'",
+      "in_list_view": 1,
+      "description": "Select the Report containing the existing button (required for reports)"
+    },
+    {
+      "fieldname": "button_type",
+      "fieldtype": "Select",
+      "label": "Button Type",
+      "options": "Normal\nGrouped",
+      "reqd": 1,
+      "default": "Normal",
+      "in_list_view": 1,
+      "description": "Type of button: Normal (standalone) or Grouped (in dropdown)"
+    },
+    {
+      "fieldname": "button_label",
+      "fieldtype": "Data",
+      "label": "Button Label",
+      "reqd": 1,
+      "in_list_view": 1,
+      "description": "Label/name of the existing button to control (case-sensitive)"
+    },
+    {
+      "fieldname": "button_group",
+      "fieldtype": "Data",
+      "label": "Button Group",
+      "depends_on": "eval:doc.button_type=='Grouped'",
+      "mandatory_depends_on": "eval:doc.button_type=='Grouped'",
+      "description": "Group name for grouped buttons (required for grouped buttons)"
+    },
+    {
+      "fieldname": "callback_function",
+      "fieldtype": "Code",
+      "label": "Callback Function",
+      "options": "JavaScript",
+      "description": "JavaScript callback function for button recreation (optional)"
+    },
+    {
+      "fieldname": "timeout_ms",
+      "fieldtype": "Int",
+      "label": "Timeout (ms)",
+      "default": 500,
+      "description": "Delay in milliseconds before applying button control (default: 500ms)"
+    },
+    {
+      "fieldname": "section_break_conditions",
+      "fieldtype": "Section Break",
+      "label": "Visibility Conditions"
+    },
+    {
+      "fieldname": "conditions",
+      "fieldtype": "Table",
+      "label": "Conditions",
+      "options": "Button Condition",
+      "description": "Define when the button should be visible"
+    },
+    {
+      "fieldname": "section_break_role_permissions",
+      "fieldtype": "Section Break",
+      "label": "Role Permissions"
+    },
+    {
+      "fieldname": "allowed_roles",
+      "fieldtype": "Table",
+      "label": "Allowed Roles",
+      "options": "Button Role Condition",
+      "description": "Roles that can see this button with conditions"
+    },
+    {
+      "fieldname": "section_break_user_exceptions",
+      "fieldtype": "Section Break",
+      "label": "User Exceptions"
+    },
+    {
+      "fieldname": "user_exceptions",
+      "fieldtype": "Table",
+      "label": "User Exceptions",
+      "options": "Button User Exception",
+      "description": "Users with special button visibility exceptions"
+    },
+    {
+      "fieldname": "section_break_settings",
+      "fieldtype": "Section Break",
+      "label": "Settings"
+    },
+    {
+      "fieldname": "is_active",
+      "fieldtype": "Check",
+      "label": "Is Active",
+      "default": 1,
+      "description": "Enable/disable this button configuration"
+    }
+  ],
+  "index_web_pages_for_search": 1,
+  "links": [],
+  "modified": "2025-09-26 10:00:00.000000",
+  "modified_by": "Administrator",
+  "module": "Dev Assistant",
+  "name": "Button Configuration",
+  "naming_rule": "Expression",
+  "owner": "Administrator",
+  "permissions": [
+    {
+      "create": 1,
+      "delete": 1,
+      "email": 1,
+      "export": 1,
+      "print": 1,
+      "read": 1,
+      "report": 1,
+      "role": "System Manager",
+      "share": 1,
+      "write": 1
+    }
+  ],
+  "sort_field": "modified",
+  "sort_order": "DESC",
+  "states": [],
+  "title_field": "button_label",
+  "track_changes": 1
+}
