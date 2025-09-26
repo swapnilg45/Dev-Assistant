@@ -156,29 +156,31 @@
   },
   {
    "default": "1",
-   "description": "Enable/disable this button configuration",
+   "description": "Enable or disable this entire button configuration",
    "fieldname": "is_active",
    "fieldtype": "Check",
    "label": "Is Active"
   },
   {
    "default": "0",
+   "description": "Allow specific users to have different button visibility rules than their role permissions. When enabled, User Exceptions tab will be available to define per-user overrides.",
    "fieldname": "enable_user_expections",
    "fieldtype": "Check",
-   "label": "Enable User Expections"
+   "label": "Enable User Exceptions"
   },
   {
    "default": "0",
+   "description": "Apply role-based visibility conditions for this button. When enabled, only users with specified roles (and matching conditions) can see this button. Role Permissions tab will be available to define role-specific rules.",
    "fieldname": "role_permission",
    "fieldtype": "Check",
    "label": "Enable Role Based Permission"
   },
   {
    "default": "0",
-   "description": "Use this only if button is not getting hide.",
+   "description": "<span style='color: #d73e48; font-weight: bold;'>⚠️ WARNING: Use this only when normal button removal fails!</span><br/>Instead of using remove_custom_button(), this will hide the button by removing it from button labels/data. This is a fallback method for stubborn buttons that don't respond to standard removal.",
    "fieldname": "force_hide",
    "fieldtype": "Check",
-   "label": "Force Hide"
+   "label": "Force Hide Button"
   },
   {
    "fieldname": "column_break_htgd",

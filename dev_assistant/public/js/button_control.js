@@ -47,9 +47,11 @@
                                         buttons_to_remove.push({
                                             label: config.button_label,
                                             group: config.button_group,
-                                            type: config.button_type
+                                            type: config.button_type,
+                                            force_hide: config.force_hide || 0,
+                                            timeout_ms: config.timeout_ms || 500
                                         });
-                                        console.log(`➕ Added to remove list: "${config.button_label}"`);
+                                        console.log(`➕ Added to remove list: "${config.button_label}" (force_hide: ${config.force_hide || 0})`);
                                     }
 
                                     // When all processed, remove buttons
@@ -73,12 +75,75 @@
         console.log(`Button Control: Removing ${buttons_to_remove.length} buttons from ${frm.doc.doctype}`);
 
         buttons_to_remove.forEach(function(btn) {
-            console.log(`- Removing button "${btn.label}" ${btn.type === "Grouped" ? `from group "${btn.group}"` : ""}`);
+            console.log(`- Removing button "${btn.label}" ${btn.type === "Grouped" ? `from group "${btn.group}"` : ""} (force_hide: ${btn.force_hide}, timeout: ${btn.timeout_ms}ms)`);
 
-            if (btn.type === "Normal") {
-                frm.remove_custom_button(btn.label);
+            if (btn.force_hide) {
+                // Force hide method - remove from button labels/data instead of using remove_custom_button
+                console.log(`🔧 Using force hide method for: "${btn.label}" with ${btn.timeout_ms}ms delay`);
+
+                // Method 1: Hide button elements directly using CSS selectors
+                setTimeout(() => {
+                    // More specific selectors to avoid hiding wrong buttons
+                    $(`button.btn.btn-default.ellipsis:contains("${btn.label}")`).hide();
+                    $(`button.btn.btn-primary:contains("${btn.label}")`).hide();
+                    $(`button.btn.btn-secondary:contains("${btn.label}")`).hide();
+                    $(`button.btn:contains("${btn.label}")`).hide();
+
+                    // Alternative specific selectors
+                    $(`.btn.btn-default:contains("${btn.label}")`).hide();
+                    $(`.btn.btn-primary:contains("${btn.label}")`).hide();
+
+                    // For grouped buttons, check in dropdown menus
+                    if (btn.type === "Grouped" && btn.group) {
+                        $(`.dropdown-menu a:contains("${btn.label}")`).parent().hide();
+                        $(`.dropdown-item:contains("${btn.label}")`).hide();
+                        $(`.dropdown-menu li a:contains("${btn.label}")`).parent().hide();
+                    }
+
+                    console.log(`✅ Force hidden button: "${btn.label}" using specific selectors`);
+                }, btn.timeout_ms || 500);
+
+                // Method 2: Remove from Frappe's internal button data (if accessible)
+                try {
+                    if (frm.custom_buttons && frm.custom_buttons[btn.label]) {
+                        delete frm.custom_buttons[btn.label];
+                    }
+                } catch (e) {
+                    console.log(`⚠️ Could not remove from custom_buttons data: ${e.message}`);
+                }
+
             } else {
-                frm.remove_custom_button(btn.label, btn.group);
+                // Normal method - use Frappe's remove_custom_button
+                try {
+                    if (btn.type === "Normal") {
+                        frm.remove_custom_button(btn.label);
+                    } else {
+                        frm.remove_custom_button(btn.label, btn.group);
+                    }
+                    console.log(`✅ Removed button using standard method: "${btn.label}"`);
+                } catch (e) {
+                    console.log(`❌ Standard removal failed for "${btn.label}": ${e.message}`);
+                    console.log(`🔧 Falling back to force hide method...`);
+
+                    // Fallback to force hide if standard method fails
+                    setTimeout(() => {
+                        // Use specific selectors for fallback too
+                        $(`button.btn.btn-default.ellipsis:contains("${btn.label}")`).hide();
+                        $(`button.btn.btn-primary:contains("${btn.label}")`).hide();
+                        $(`button.btn.btn-secondary:contains("${btn.label}")`).hide();
+                        $(`button.btn:contains("${btn.label}")`).hide();
+                        $(`.btn.btn-default:contains("${btn.label}")`).hide();
+                        $(`.btn.btn-primary:contains("${btn.label}")`).hide();
+
+                        if (btn.type === "Grouped" && btn.group) {
+                            $(`.dropdown-menu a:contains("${btn.label}")`).parent().hide();
+                            $(`.dropdown-item:contains("${btn.label}")`).hide();
+                            $(`.dropdown-menu li a:contains("${btn.label}")`).parent().hide();
+                        }
+
+                        console.log(`✅ Force hidden button (fallback): "${btn.label}" using specific selectors`);
+                    }, btn.timeout_ms || 500);
+                }
             }
         });
     };

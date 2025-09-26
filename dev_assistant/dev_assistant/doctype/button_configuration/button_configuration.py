@@ -161,7 +161,7 @@ def get_button_configurations(doctype=None, report=None):
     configurations = frappe.get_all(
         "Button Configuration",
         filters=filters,
-        fields=["name"]
+        fields=["name", "button_label", "button_group", "button_type", "timeout_ms", "force_hide", "enable_user_expections", "role_permission"]
     )
 
     result = []
@@ -171,8 +171,11 @@ def get_button_configurations(doctype=None, report=None):
     for config in configurations:
         doc = frappe.get_doc("Button Configuration", config.name)
 
-        # Check user exceptions first
-        user_exception = _check_user_exception(doc, current_user)
+        # Check user exceptions first (only if enabled)
+        user_exception = None
+        if doc.enable_user_expections:
+            user_exception = _check_user_exception(doc, current_user)
+
         if user_exception is not None:
             config_data = {
                 "name": doc.name,
@@ -180,14 +183,20 @@ def get_button_configurations(doctype=None, report=None):
                 "button_type": doc.button_type,
                 "button_group": doc.button_group,
                 "callback_function": doc.callback_function,
+                "timeout_ms": doc.timeout_ms or 500,
+                "force_hide": doc.force_hide or 0,
+                "enable_user_expections": doc.enable_user_expections or 0,
+                "role_permission": doc.role_permission or 0,
                 "visible": user_exception,
                 "reason": "user_exception"
             }
             result.append(config_data)
             continue
 
-        # Check role-based access
-        has_role_access = _check_role_access(doc, user_roles)
+        # Check role-based access (only if enabled)
+        has_role_access = True  # Default to True if role permission is disabled
+        if doc.role_permission:
+            has_role_access = _check_role_access(doc, user_roles)
 
         # Get conditions to be evaluated on client side
         conditions = []
@@ -206,6 +215,10 @@ def get_button_configurations(doctype=None, report=None):
             "button_type": doc.button_type,
             "button_group": doc.button_group,
             "callback_function": doc.callback_function,
+            "timeout_ms": doc.timeout_ms or 500,
+            "force_hide": doc.force_hide or 0,
+            "enable_user_expections": doc.enable_user_expections or 0,
+            "role_permission": doc.role_permission or 0,
             "has_role_access": has_role_access,
             "conditions": conditions,
             "visible": has_role_access  # Initial visibility based on role
@@ -279,23 +292,25 @@ def evaluate_button_visibility(button_name, doc_data=None):
 
     current_user = frappe.session.user
 
-    # Check user exception first (highest priority)
-    user_exception = _check_user_exception(config, current_user)
-    if user_exception is not None:
-        return {
-            "visible": user_exception,
-            "reason": "user_exception"
-        }
+    # Check user exception first (highest priority, only if enabled)
+    if config.enable_user_expections:
+        user_exception = _check_user_exception(config, current_user)
+        if user_exception is not None:
+            return {
+                "visible": user_exception,
+                "reason": "user_exception"
+            }
 
-    # Check role access
-    user_roles = frappe.get_roles(current_user)
-    has_role = _check_role_access(config, user_roles)
+    # Check role access (only if enabled)
+    if config.role_permission:
+        user_roles = frappe.get_roles(current_user)
+        has_role = _check_role_access(config, user_roles)
 
-    if not has_role:
-        return {
-            "visible": False,
-            "reason": "no_role_access"
-        }
+        if not has_role:
+            return {
+                "visible": False,
+                "reason": "no_role_access"
+            }
 
     # Evaluate field conditions if doc_data provided
     if doc_data and config.conditions:
