@@ -26,9 +26,12 @@ app_license = "mit"
 
 # include js, css files in header of desk.html
 # app_include_css = "/assets/dev_assistant/css/dev_assistant.css"
+
+# ============================================================================
+# FIELD ACCESS CONTROL - Realtime Cache Management
+# ============================================================================
 app_include_js = [
-    "/assets/dev_assistant/js/field_access_control.js",
-    "/assets/dev_assistant/js/button_control.js"
+    "/assets/dev_assistant/js/field_access_realtime.js"
 ]
 
 # include js, css files in header of web template
@@ -145,6 +148,26 @@ doctype_js = {
 doc_events = {
 	"*": {
 		"validate": "dev_assistant.dev_assistant.mandatory_field_validation.validator.validate_mandatory_fields"
+	},
+	# ============================================================================
+	# ACCESS CONTROL - Cache Invalidation Events
+	# ============================================================================
+	"Field Access Control": {
+		"on_update": "dev_assistant.access_control.utils.clear_configuration_cache",
+		"on_trash": "dev_assistant.access_control.utils.clear_configuration_cache",
+		"after_insert": "dev_assistant.access_control.utils.clear_configuration_cache"
+	},
+	"Field Configuration Detail": {
+		"on_update": "dev_assistant.access_control.utils.clear_parent_cache",
+		"on_trash": "dev_assistant.access_control.utils.clear_parent_cache"
+	},
+	"User Exception Detail": {
+		"on_update": "dev_assistant.access_control.utils.clear_parent_cache",
+		"on_trash": "dev_assistant.access_control.utils.clear_parent_cache"
+	},
+	"Child Table Button Configuration": {
+		"on_update": "dev_assistant.access_control.utils.clear_parent_cache",
+		"on_trash": "dev_assistant.access_control.utils.clear_parent_cache"
 	}
 }
 
@@ -206,6 +229,11 @@ doc_events = {
 # ----------
 # before_job = ["dev_assistant.utils.before_job"]
 # after_job = ["dev_assistant.utils.after_job"]
+
+# ============================================================================
+# ACCESS CONTROL - User Logout Event
+# ============================================================================
+on_logout = "dev_assistant.access_control.utils.clear_user_cache"
 
 # User Data Protection
 # --------------------
